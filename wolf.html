@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Document</title>
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		#wrap{
+			cursor: pointer;
+			width: 320px;
+			height: 480px;
+			background: url('img/game_bg.jpg') 0 0 no-repeat;
+			margin: 0 auto;
+			position: relative;
+		}
+		#wolfBox div{
+
+			width: 108px;
+			height: 101px;
+			position: absolute;
+			background-repeat: no-repeat;
+		}
+		#score{
+			position: absolute;
+			font-size: 24px;
+			color:white;
+			font-family: arial;
+			left: 55px;
+			top:8px;
+		}
+		#timeBar{
+			width: 180px;
+			height: 16px;
+			background: url('img/progress.png') 0 0 no-repeat;
+			position: absolute;
+			left: 63px;
+			top:66px;
+		}
+		#menu{
+			position: absolute;
+			width: 100%;
+			top:175px;
+		}
+		#menu a,#over{
+			color:#fd5f02;
+			text-shadow: 0 0 5px #fbed30;
+			font-size: 34px;
+			text-align: center;
+		}
+		#menu a{
+			display: block;
+			text-decoration: none;
+			font-weight: bold;
+		}
+		#over{
+			display: none;
+			font-family: arial;
+			position: absolute;
+			width: 100%;
+			top:220px;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="score"></div>
+		<div id="timeBar"></div>
+		<div id="wolfBox"></div>
+		<div id="menu">
+			<a href="javascript:void(0)">游戏开始</a>
+			<a href="javascript:void(0)">游戏操作说明</a>
+		</div>
+		<div id="over">game over!</div>
+	</div>
+	<script type="text/javascript">
+		var wrap = document.getElementById('wrap');
+		var wolfBox = document.getElementById('wolfBox');
+		var scoreBox = document.getElementById('score');
+		var timeBar = document.getElementById('timeBar');
+		var menu = document.getElementById('menu');
+		var over = document.getElementById('over');
+		var begin = menu.children[0];
+		var manual = menu.children[0];
+		var perWidth = timeBar.offsetWidth;
+		var score = 0;
+		var posList = [
+			{l:"95px",t:"114px"},
+			{l:"182px",t:"141px"},
+			{l:"14px",t:"160px"},
+			{l:"15px",t:"221px"},
+			{l:"101px",t:"192px"},
+			{l:"197px",t:"213px"},
+			{l:"28px",t:"294px"},
+			{l:"116px",t:"274px"},
+			{l:"204px",t:"296px"}
+		];
+		var pos = [];
+		function createWolf(){
+				var wolf = document.createElement('div');
+				var rnd = Math.floor(Math.random()*9);
+				console.log(rnd);
+				var who = Math.random()>0.8?"x":"h";
+				var index = 0;
+				var flag = true;
+				var clickFlag = false;
+				wolf.style.backgroundImage = "url(img/"+who+".png)";
+				while(pos.indexOf(rnd)>-1){
+					rnd = Math.floor(Math.random()*9);
+					console.log(rnd);
+				}
+				pos.push(rnd);
+				console.log(rnd);
+				if(pos.length>4){
+					pos.shift();
+				}
+				console.log(rnd);
+				wolf.style.left = posList[rnd].l;
+				wolf.style.top = posList[rnd].t;
+				wolfBox.appendChild(wolf);
+				wolf.onclick = function(){
+					index = 5;
+					clickFlag = true;
+					wolf.onclick = null;
+					if(who=="h"){
+						score +=10;
+					}else{
+						score -=10;
+					}
+					scoreBox.innerHTML = score;
+				}
+				var goTime = setInterval(function() {
+					if(flag||clickFlag){
+						index++;
+					}else{
+						index--;
+					}
+					if(index>=5){
+						flag = false;
+					}
+					if(index<0||index>9){
+						clearInterval(goTime);
+						wolfBox.removeChild(wolf);
+					}
+					wolf.style.backgroundPosition = -index*108 + "px 0";
+				}, 100);
+		}
+		function Time(){
+			var time = setInterval(createWolf, 1000);
+			var gameTime = setInterval(function() {
+				perWidth--;
+				if(perWidth<0){
+					clearInterval(time);
+					if(wolfBox.children.length==0){
+						over.style.display = "block";
+						clearInterval(gameTime);
+					}
+				}
+				timeBar.style.width = perWidth + "px";
+			}, 50);
+		}
+		begin.onclick = function(){
+			menu.style.display = "none";
+			Time();
+			//createWolf();
+		}
+	</script>
+</body>
+</html>
